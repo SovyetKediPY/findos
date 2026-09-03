@@ -1,1 +1,42 @@
+name: Programları oluştur
 
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        sistem: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.sistem }}
+
+    steps:
+      - name: Kodları indir
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: PyInstaller kur
+        run: python -m pip install pyinstaller
+
+      - name: Programı oluştur
+        run: python -m PyInstaller --onefile program.py
+
+      - name: Linux programını kaydet
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-program
+          path: dist/program
+
+      - name: Windows programını kaydet
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-program
+          path: dist/program.exe
